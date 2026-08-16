@@ -1,0 +1,20 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary Microsoft Office files
+~$*.docx
+~$*.xlsx
+~$*.pptx
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Database & Large Media (Nên lưu trữ trên Cloud Drive)
+*.dump
+*.sql
+*.zip
+*.mp4
