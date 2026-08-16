@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.36.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.17.0">
+  <bpmn:collaboration id="Collaboration_0x8k72j">
+    <bpmn:participant id="Participant_0uhw8s6" processRef="Process_0an8p2x" />
+    <bpmn:participant id="Participant_172k34a" name="Nhà cung cấp" />
+    <bpmn:messageFlow id="Flow_0j2x43k" name="Yêu cầu báo giá" sourceRef="Activity_0q3p43k" targetRef="Participant_172k34a" />
+    <bpmn:messageFlow id="Flow_1u3x43k" name="Bảng báo giá" sourceRef="Participant_172k34a" targetRef="Activity_0w4p43k" />
+    <bpmn:messageFlow id="Flow_2p4x43k" name="Đơn mua hàng" sourceRef="Activity_0e5p43k" targetRef="Participant_172k34a" />
+    <bpmn:messageFlow id="Flow_3l5x43k" name="Hàng hóa" sourceRef="Participant_172k34a" targetRef="Activity_1r6p43k" />
+    <bpmn:textAnnotation id="TextAnnotation_SystemMsg">
+      <bpmn:text>Hệ thống tự động tạo phiếu kho</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_LabelLink" sourceRef="Association_SystemTrigger" targetRef="TextAnnotation_SystemMsg" />
+    <bpmn:textAnnotation id="TextAnnotation_Acc_Payment">
+      <bpmn:text>Nợ 331 / Có 112</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_Acc3" sourceRef="Activity_1y8p43k" targetRef="TextAnnotation_Acc_Payment" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_0an8p2x" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_0j3k43k">
+      <bpmn:lane id="Lane_Purchasing" name="Bộ phận mua hàng">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0q3p43k</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0w4p43k</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_ConfirmPO</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_0e5p43k</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1t7p43k</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Finance" name="Bộ phận tài chính">
+        <bpmn:flowNodeRef>Activity_1y8p43k</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1z9p43k</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Warehouse" name="Bộ phận kho">
+        <bpmn:flowNodeRef>Activity_1r6p43k</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_1" name="Tiếp nhận yêu cầu">
+      <bpmn:outgoing>Flow_0a1b2c3</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Activity_0q3p43k" name="Gửi yêu cầu báo giá RFQ">
+      <bpmn:incoming>Flow_0a1b2c3</bpmn:incoming>
+      <bpmn:outgoing>Flow_0b2c3d4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Activity_0w4p43k" name="Đánh giá và lựa chọn nhà cung cấp">
+      <bpmn:incoming>Flow_0b2c3d4</bpmn:incoming>
+      <bpmn:outgoing>Flow_0c3d4e5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Activity_ConfirmPO" name="Xác nhận đơn hàng (Confirm PO)">
+      <bpmn:incoming>Flow_0c3d4e5</bpmn:incoming>
+      <bpmn:outgoing>Flow_0d4e5f6</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0a1b2c3">
+        <bpmn:targetRef>DataObjectReference_PO</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:task id="Activity_0e5p43k" name="Thông báo đến nhà cung cấp">
+      <bpmn:incoming>Flow_0d4e5f6</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToWarehouse</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Activity_1r6p43k" name="Nhận hàng">
+      <bpmn:incoming>Flow_ToWarehouse</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToInvoice</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_Shipment">
+        <bpmn:targetRef>DataObjectReference_Shipment</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:task id="Activity_1y8p43k" name="Thanh toán">
+      <bpmn:incoming>Flow_ToPayment</bpmn:incoming>
+      <bpmn:outgoing>Flow_End</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_0a1b2c3" sourceRef="StartEvent_1" targetRef="Activity_0q3p43k" />
+    <bpmn:sequenceFlow id="Flow_0b2c3d4" sourceRef="Activity_0q3p43k" targetRef="Activity_0w4p43k" />
+    <bpmn:sequenceFlow id="Flow_0c3d4e5" sourceRef="Activity_0w4p43k" targetRef="Activity_ConfirmPO" />
+    <bpmn:sequenceFlow id="Flow_0d4e5f6" sourceRef="Activity_ConfirmPO" targetRef="Activity_0e5p43k" />
+    <bpmn:sequenceFlow id="Flow_ToWarehouse" sourceRef="Activity_0e5p43k" targetRef="Activity_1r6p43k" />
+    <bpmn:sequenceFlow id="Flow_ToInvoice" sourceRef="Activity_1r6p43k" targetRef="Activity_1t7p43k" />
+    <bpmn:sequenceFlow id="Flow_ToPayment" sourceRef="Activity_1t7p43k" targetRef="Activity_1y8p43k" />
+    <bpmn:sequenceFlow id="Flow_End" sourceRef="Activity_1y8p43k" targetRef="Event_1z9p43k" />
+    <bpmn:dataObjectReference id="DataObjectReference_Invoice" name="Supplier Invoice" dataObjectRef="DataObject_Invoice" />
+    <bpmn:dataObject id="DataObject_Invoice" />
+    <bpmn:endEvent id="Event_1z9p43k" name="Kết thúc">
+      <bpmn:incoming>Flow_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataObjectReference id="DataObjectReference_PO" name="Purchase Order" dataObjectRef="DataObject_PO" />
+    <bpmn:dataObject id="DataObject_PO" />
+    <bpmn:task id="Activity_1t7p43k" name="Xác nhận hóa đơn">
+      <bpmn:incoming>Flow_ToInvoice</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToPayment</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_Invoice">
+        <bpmn:targetRef>DataObjectReference_Invoice</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:dataObjectReference id="DataObjectReference_Shipment" name="Incoming Shipment" dataObjectRef="DataObject_Shipment" />
+    <bpmn:dataObject id="DataObject_Shipment" />
+    <bpmn:association id="Association_SystemTrigger" sourceRef="Activity_ConfirmPO" targetRef="Activity_1r6p43k" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0x8k72j">
+      <bpmndi:BPMNShape id="Participant_0uhw8s6_di" bpmnElement="Participant_0uhw8s6" isHorizontal="true">
+        <dc:Bounds x="160" y="200" width="1188" height="660" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_3j3k43k_di" bpmnElement="Lane_Warehouse" isHorizontal="true">
+        <dc:Bounds x="190" y="630" width="1158" height="230" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_2j3k43k_di" bpmnElement="Lane_Finance" isHorizontal="true">
+        <dc:Bounds x="190" y="450" width="1158" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1j3k43k_di" bpmnElement="Lane_Purchasing" isHorizontal="true">
+        <dc:Bounds x="190" y="200" width="1158" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="252" y="302" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0q3p43k_di" bpmnElement="Activity_0q3p43k">
+        <dc:Bounds x="340" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0w4p43k_di" bpmnElement="Activity_0w4p43k">
+        <dc:Bounds x="500" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_ConfirmPO_di" bpmnElement="Activity_ConfirmPO">
+        <dc:Bounds x="660" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0e5p43k_di" bpmnElement="Activity_0e5p43k">
+        <dc:Bounds x="820" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1r6p43k_di" bpmnElement="Activity_1r6p43k">
+        <dc:Bounds x="900" y="680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1y8p43k_di" bpmnElement="Activity_1y8p43k">
+        <dc:Bounds x="1100" y="500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_Invoice_di" bpmnElement="DataObjectReference_Invoice">
+        <dc:Bounds x="1042" y="205" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1021" y="255" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1z9p43k_di" bpmnElement="Event_1z9p43k">
+        <dc:Bounds x="1262" y="522" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1259" y="558" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_PO_di" bpmnElement="DataObjectReference_PO">
+        <dc:Bounds x="742" y="385" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="721" y="435" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1t7p43k_di" bpmnElement="Activity_1t7p43k">
+        <dc:Bounds x="990" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataObjectReference_Shipment_di" bpmnElement="DataObjectReference_Shipment">
+        <dc:Bounds x="992" y="775" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="986" y="825" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0a1b2c3_di" bpmnElement="Flow_0a1b2c3">
+        <di:waypoint x="288" y="320" />
+        <di:waypoint x="340" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0b2c3d4_di" bpmnElement="Flow_0b2c3d4">
+        <di:waypoint x="440" y="320" />
+        <di:waypoint x="500" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0c3d4e5_di" bpmnElement="Flow_0c3d4e5">
+        <di:waypoint x="600" y="320" />
+        <di:waypoint x="660" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0d4e5f6_di" bpmnElement="Flow_0d4e5f6">
+        <di:waypoint x="760" y="320" />
+        <di:waypoint x="820" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToWarehouse_di" bpmnElement="Flow_ToWarehouse">
+        <di:waypoint x="870" y="360" />
+        <di:waypoint x="870" y="720" />
+        <di:waypoint x="900" y="720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToInvoice_di" bpmnElement="Flow_ToInvoice">
+        <di:waypoint x="1000" y="720" />
+        <di:waypoint x="1040" y="720" />
+        <di:waypoint x="1040" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToPayment_di" bpmnElement="Flow_ToPayment">
+        <di:waypoint x="1090" y="330" />
+        <di:waypoint x="1150" y="330" />
+        <di:waypoint x="1150" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_End_di" bpmnElement="Flow_End">
+        <di:waypoint x="1200" y="540" />
+        <di:waypoint x="1262" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_SystemTrigger_di" bpmnElement="Association_SystemTrigger">
+        <di:waypoint x="710" y="360" />
+        <di:waypoint x="710" y="741" />
+        <di:waypoint x="900" y="739" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_172k34a_di" bpmnElement="Participant_172k34a" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1188" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_Acc3_di" bpmnElement="Association_Acc3">
+        <di:waypoint x="1194" y="579" />
+        <di:waypoint x="1219" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_SystemMsg_di" bpmnElement="TextAnnotation_SystemMsg">
+        <dc:Bounds x="730" y="525" width="120" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_0a1b2c3_di" bpmnElement="DataOutputAssociation_0a1b2c3">
+        <di:waypoint x="729" y="360" />
+        <di:waypoint x="748" y="385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_Shipment_di" bpmnElement="DataOutputAssociation_Shipment">
+        <di:waypoint x="950" y="760" />
+        <di:waypoint x="992" y="788" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_Invoice_di" bpmnElement="DataOutputAssociation_Invoice">
+        <di:waypoint x="1020" y="290" />
+        <di:waypoint x="1042" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0j2x43k_di" bpmnElement="Flow_0j2x43k">
+        <di:waypoint x="390" y="280" />
+        <di:waypoint x="390" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="410" y="183" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1u3x43k_di" bpmnElement="Flow_1u3x43k">
+        <di:waypoint x="550" y="140" />
+        <di:waypoint x="550" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="568" y="183" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2p4x43k_di" bpmnElement="Flow_2p4x43k">
+        <di:waypoint x="870" y="280" />
+        <di:waypoint x="870" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="793" y="183" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3l5x43k_di" bpmnElement="Flow_3l5x43k">
+        <di:waypoint x="950" y="140" />
+        <di:waypoint x="950" y="680" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="966" y="400" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_LabelLink_di" bpmnElement="Association_LabelLink">
+        <di:waypoint x="710" y="628" />
+        <di:waypoint x="730" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_Acc_Payment_di" bpmnElement="TextAnnotation_Acc_Payment">
+        <dc:Bounds x="1210" y="600" width="120" height="40" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
