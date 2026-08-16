@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ACTION -->
+    <record id="action_hanviet_exchange_rate"
+            model="ir.actions.act_window">
+        <field name="name">KRW → VND Exchange Rates</field>
+        <field name="res_model">hanviet.exchange.rate</field>
+        <field name="view_mode">list,form,graph,pivot,kanban</field>
+    </record>
+
+    <!-- LIST VIEW -->
+    <record id="view_hanviet_exchange_rate_list"
+            model="ir.ui.view">
+        <field name="name">hanviet.exchange.rate.list</field>
+        <field name="model">hanviet.exchange.rate</field>
+        <field name="arch" type="xml">
+            <list string="KRW → VND Exchange Rates"
+                  decoration-success="state == 'approved'"
+                  decoration-info="state == 'analyzed'"
+                  decoration-warning="state == 'fetched'"
+                  decoration-muted="state == 'archived'">
+
+                <field name="date"/>
+                <field name="krw_to_vnd"/>
+                <field name="sma_7"/>
+                <field name="sma_30"/>
+                <field name="volatility"/>
+                <field name="recommendation"/>
+                <field name="state"/>
+
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM VIEW -->
+    <record id="view_hanviet_exchange_rate_form"
+            model="ir.ui.view">
+        <field name="name">hanviet.exchange.rate.form</field>
+        <field name="model">hanviet.exchange.rate</field>
+        <field name="arch" type="xml">
+
+            <form string="KRW → VND Exchange Rate">
+
+                <!-- HEADER -->
+                <header>
+
+                    <button name="action_fetch"
+                            type="object"
+                            string="Fetch"
+                            class="btn-primary"
+                            modifiers="{'invisible': [['state','!=','new']]}"/>
+
+                    <button name="action_analyze"
+                            type="object"
+                            string="Analyze"
+                            class="btn-secondary"
+                            modifiers="{'invisible': [['state','!=','fetched']]}"/>
+
+                    <button name="action_approve"
+                            type="object"
+                            string="Approve"
+                            class="btn-success"
+                            modifiers="{'invisible': [['state','!=','analyzed']]}"/>
+
+                    <button name="action_archive"
+                            type="object"
+                            string="Archive"
+                            class="btn-danger"
+                            modifiers="{'invisible': [['state','in',['approved','archived']]]}"/>
+
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="new,fetched,analyzed,approved,archived"/>
+
+                </header>
+
+                <!-- BODY -->
+                <sheet>
+
+                    <group>
+                        <group>
+                            <field name="date"/>
+                        </group>
+
+                        <group>
+                            <field name="krw_to_vnd"
+                                   modifiers="{'readonly': [['state','in',['approved','archived']]]}"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+
+                        <page string="Analysis">
+                            <group>
+                                <field name="sma_7"/>
+                                <field name="sma_30"/>
+                                <field name="volatility"/>
+                            </group>
+                        </page>
+                                                
+                        <page string="Recommendation">
+                            <group>
+                                <field name="recommendation"/>
+                                <field name="recommendation_reason"
+                                    nolabel="1"
+                                    readonly="1"
+                                    widget="text"/>
+                            </group>
+                        </page>
+
+                        
+
+                    </notebook>
+
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+
+    <!-- SEARCH VIEW -->
+    <record id="view_hanviet_exchange_rate_search"
+            model="ir.ui.view">
+        <field name="name">hanviet.exchange.rate.search</field>
+        <field name="model">hanviet.exchange.rate</field>
+        <field name="arch" type="xml">
+            <search>
+
+                <field name="date"/>
+                <field name="state"/>
+                <field name="recommendation"/>
+
+                <filter name="available"
+                        string="Available"
+                        domain="['|',
+                            ('state','=','new'),
+                            ('state','=','fetched')
+                        ]"/>
+
+                <filter name="group_by_date"
+                        string="Group by Date"
+                        context="{'group_by':'date'}"/>
+
+            </search>
+        </field>
+    </record>
+
+<!-- CALENDAR VIEW -->
+    <!-- GRAPH VIEW Dashboard -->
+    <record id="view_hanviet_exchange_rate_graph"
+            model="ir.ui.view">
+        <field name="name">hanviet.exchange.rate.graph</field>
+        <field name="model">hanviet.exchange.rate</field>
+        <field name="arch" type="xml">
+            <graph string="KRW → VND Trend Analysis" type="line">
+                <field name="date" type="row"/>
+                <field name="krw_to_vnd" type="measure"/>
+                <field name="sma_7" type="measure"/>
+                <field name="sma_30" type="measure"/>
+                <field name="ema_7" type="measure"/>
+                <field name="ema_30" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- PIVOT VIEW - tổng hợp khuyến nghị -->
+    <record id="view_hanviet_exchange_rate_pivot"
+            model="ir.ui.view">
+        <field name="name">hanviet.exchange.rate.pivot</field>
+        <field name="model">hanviet.exchange.rate</field>
+        <field name="arch" type="xml">
+            <pivot string="Recommendation Summary">
+                <field name="recommendation" type="row"/>
+                <field name="krw_to_vnd" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+<!-- KANBAN VIEW - trực quan trạng thái -->
+    <record id="view_hanviet_exchange_rate_kanban"
+            model="ir.ui.view">
+        <field name="name">hanviet.exchange.rate.kanban</field>
+        <field name="model">hanviet.exchange.rate</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="state"/>
+                <field name="recommendation"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_card">
+                            <strong>
+                                <field name="date"/>
+                            </strong>
+                            <div>
+                                Rate: <field name="krw_to_vnd"/>
+                            </div>
+                            <div>
+                                Recommendation:
+                                <field name="recommendation"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+
+</odoo>

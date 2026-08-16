@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Root menu -->
+    <menuitem id="menu_hanviet_root"
+              name="Han Viet Finance"/>
+
+    <!-- First level menu -->
+    <menuitem id="menu_hanviet_exchange"
+              name="KRW Exchange Analysis"
+              parent="menu_hanviet_root"/>
+
+    <!-- Action menu -->
+    <menuitem id="menu_hanviet_exchange_rate"
+              action="action_hanviet_exchange_rate"
+              parent="menu_hanviet_exchange"/>
+
+</odoo>
